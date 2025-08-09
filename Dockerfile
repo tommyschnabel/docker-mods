@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 ## Buildstage ##
-FROM ghcr.io/linuxserver/baseimage-alpine:latest AS buildstage_alpine
+FROM ghcr.io/linuxserver/baseimage-alpine:3.22 AS buildstage
 
 # copy local files
 COPY root/ /root-layer/
@@ -23,4 +23,4 @@ FROM scratch
 LABEL maintainer="tommyschnabel"
 
 # Add files from buildstage
-COPY --from=buildstage_alpine /root-layer/ /
+COPY --from=buildstage /root-layer/ /
