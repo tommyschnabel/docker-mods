@@ -15,6 +15,7 @@ RUN echo "**** install packages ****"                                          &
     CFLAGS="-O2 -DSQLITE_ENABLE_ICU `pkg-config --cflags icu-uc icu-io`"          \
     LDFLAGS="`pkg-config --libs icu-uc icu-io`" ./configure --enable-shared    && \
     make                                                                       && \
+    echo "**** copy sqlite to root-layer ****"                                 && \
     cp ./libsqlite3* /root-layer/
 
 ## Single layer deployed image ##
