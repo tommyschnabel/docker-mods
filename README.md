@@ -1,25 +1,43 @@
-# Rsync - Docker mod for openssh-server
+# SQLite + ICU Extension, adding unicode support to SQLite
 
-This mod adds rsync to openssh-server, to be installed/updated during container start.
+This mod replaces the existing SQLite installation (usually compiled without the ICU Extension enabled reduce library size) with a version compiled with the ICU extension, adding Unicode unicode support.
 
-In openssh-server docker arguments, set an environment variable `DOCKER_MODS=linuxserver/mods:openssh-server-rsync`
+Alpine Linux and Ubuntu images are currently supported, and SQLite has been compiled with the version that already exists on those images at build-time, with the hope to avoid any incompatibility issues that might come with blindly picking the latest version.
 
-If adding multiple mods, enter them in an array separated by `|`, such as `DOCKER_MODS=linuxserver/mods:openssh-server-rsync|linuxserver/mods:openssh-server-mod2`
+# Usage
+In any linuxserver.io container, add the following environment variable:
+```
+DOCKER_MODS=linuxserver/mods:universal-sqlite-icu-extension
+```
 
-# Mod creation instructions
-
-* Fork the repo, create a new branch based on the branch `template`.
-* Edit the `Dockerfile` for the mod. `Dockerfile.complex` is only an example and included for reference; it should be deleted when done.
-* Inspect the `root` folder contents. Edit, add and remove as necessary.
-* After all init scripts and services are created, run `find ./  -path "./.git" -prune -o \( -name "run" -o -name "finish" -o -name "check" \) -not -perm -u=x,g=x,o=x -print -exec chmod +x {} +` to fix permissions.
-* Edit this readme with pertinent info, delete these instructions.
-* Finally edit the `.github/workflows/BuildImage.yml`. Customize the vars for `BASEIMAGE` and `MODNAME`. Set the versioning logic and `MULTI_ARCH` if needed.
-* Ask the team to create a new branch named `<baseimagename>-<modname>`. Baseimage should be the name of the image the mod will be applied to. The new branch will be based on the `template` branch.
-* Submit PR against the branch created by the team.
+If you're already using another mod, you can install it alongside by separating the mods with `|`:
+```
+DOCKER_MODS=linuxserver/mods:universal-sqlite-icu-extension|linuxserver/mods:my-other-mod
+```
 
 
-## Tips and tricks
+# Files that are installed with this mod
+SQLite3 is compiled from source for each of the base images defined in the Dockerfile, ensuring the ICU Extension is included.
+As such, the files that are incuded with a normal sqlite3 installation are included in the mod and will be copied into its typical install locations as executed by a `make install` in the sqlite repo.
 
-* Some images have helpers built in, these images are currently:
-    * [Openvscode-server](https://github.com/linuxserver/docker-openvscode-server/pull/10/files)
-    * [Code-server](https://github.com/linuxserver/docker-code-server/pull/95)
+Here is a sample of the files that are produced and packaged into the s6-overlay `/defaults` directory:
+```
+defaults/sqlite_icu/alpine/usr/local/bin/sqlite3
+defaults/sqlite_icu/alpine/usr/local/include/sqlite3.h
+defaults/sqlite_icu/alpine/usr/local/include/sqlite3ext.h
+defaults/sqlite_icu/alpine/usr/local/lib/libsqlite3.a
+defaults/sqlite_icu/alpine/usr/local/lib/libsqlite3.so
+defaults/sqlite_icu/alpine/usr/local/lib/libsqlite3.so.0
+defaults/sqlite_icu/alpine/usr/local/lib/libsqlite3.so.3.49.2
+defaults/sqlite_icu/alpine/usr/local/lib/pkgconfig/sqlite3.pc
+defaults/sqlite_icu/alpine/usr/local/share/man/man1/sqlite3.1
+defaults/sqlite_icu/ubuntu/usr/local/bin/sqlite3
+defaults/sqlite_icu/ubuntu/usr/local/include/sqlite3.h
+defaults/sqlite_icu/ubuntu/usr/local/include/sqlite3ext.h
+defaults/sqlite_icu/ubuntu/usr/local/lib/libsqlite3.a
+defaults/sqlite_icu/ubuntu/usr/local/lib/libsqlite3.la
+defaults/sqlite_icu/ubuntu/usr/local/lib/libsqlite3.so
+defaults/sqlite_icu/ubuntu/usr/local/lib/libsqlite3.so.0
+defaults/sqlite_icu/ubuntu/usr/local/lib/libsqlite3.so.0.8.6
+defaults/sqlite_icu/ubuntu/usr/local/lib/pkgconfig/sqlite3.pc
+```

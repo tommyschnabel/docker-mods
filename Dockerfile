@@ -15,10 +15,9 @@ RUN echo "**** install packages ****"                                          &
     CFLAGS="-O2 -DSQLITE_ENABLE_ICU $(pkg-config --cflags icu-uc icu-io)"         \
     LDFLAGS="$(pkg-config --libs icu-uc icu-io)" ./configure --enable-shared   && \
     make                                                                       && \
-    echo "**** install into /root-layer/sqlite_icu/alpine ****"                && \
+    echo "**** install into /root-layer/defaults/sqlite_icu/alpine ****"       && \
     mkdir -p /root-layer/sqlite_icu/alpine                                     && \
-    make install DESTDIR=/root-layer/sqlite_icu/alpine
-
+    make install DESTDIR=/root-layer/defaults/sqlite_icu/alpine
 
 ## Ubuntu Buildstage ##
 FROM ghcr.io/linuxserver/baseimage-ubuntu:noble AS buildstage_ubuntu
@@ -37,9 +36,9 @@ RUN echo "**** install packages ****"                                          &
     CFLAGS="-O2 -DSQLITE_ENABLE_ICU $(pkg-config --cflags icu-uc icu-io)"         \
     LDFLAGS="$(pkg-config --libs icu-uc icu-io)" ./configure --enable-shared   && \
     make                                                                       && \
-    echo "**** install into /root-layer/sqlite_icu/ubuntu ****"                && \
+    echo "**** install into /root-layer/defaults/sqlite_icu/ubuntu ****"       && \
     mkdir -p /root-layer/sqlite_icu/ubuntu                                     && \
-    make install DESTDIR=/root-layer/sqlite_icu/ubuntu
+    make install DESTDIR=/root-layer/defaults/sqlite_icu/ubuntu
 
 ## Single layer deployed image ##
 FROM scratch
