@@ -9,7 +9,7 @@ on:
         required: false
 
 env:
-  GITHUB_REPO: "tommyschnabel/docker-mods" #don't modify
+  GITHUB_REPO: "tommyschnabel/sqlite-icu-extension" #don't modify
   ENDPOINT: "tommyschnabel/sqlite-icu-extension" #don't modify
   BASEIMAGE: "alpine" #replace
   MODNAME: "sqlite-icu-extension" #replace
