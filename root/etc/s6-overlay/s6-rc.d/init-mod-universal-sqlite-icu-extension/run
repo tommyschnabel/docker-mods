@@ -5,8 +5,9 @@ if [ -f /usr/bin/apt ]; then
     echo "**** Installing SQLite version for Ubuntu from /defaults/sqlite_icu/ubuntu ****"
     cp -r /defaults/sqlite_icu/ubuntu/ /
 fi
+
 # Alpine
 if [ -f /sbin/apk ]; then
     echo "**** Installing SQLite version for Alpine from /defaults/sqlite_icu/alpine ****"
-    cp -r cp -r /defaults/sqlite_icu/alpine/ /
+    cp -r /defaults/sqlite_icu/alpine/ /
 fi

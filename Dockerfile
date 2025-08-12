@@ -9,8 +9,9 @@ COPY root/ /root-layer/
 RUN echo "**** install packages ****"                                          && \
     apk add sqlite icu-dev build-base git --no-cache                           && \
     echo "**** clone sqlite and checkout version matching our system ****"     && \
-    git clone https://github.com/sqlite/sqlite.git -b "version-$(sqlite3 --version | cut -d ' ' -f 1)" && \
+    git clone https://github.com/sqlite/sqlite.git                             && \
     cd sqlite                                                                  && \
+    git checkout "version-$(sqlite3 --version | cut -d ' ' -f 1)"              && \
     echo "**** recompile sqlite with icu extension ****"                       && \
     CFLAGS="-O2 -DSQLITE_ENABLE_ICU $(pkg-config --cflags icu-uc icu-io)"         \
     LDFLAGS="$(pkg-config --libs icu-uc icu-io)" ./configure --enable-shared   && \
@@ -29,7 +30,7 @@ RUN echo "**** install packages ****"                                          &
     apt update                                                                 && \
     apt install -y sqlite3 libicu-dev build-essential git tclsh pkg-config     && \
     echo "**** clone sqlite and checkout version matching our system ****"     && \
-    git clone https://github.com/sqlite/sqlite.git -b "version-$(sqlite3 --version | cut -d ' ' -f 1)" && \
+    git clone https://github.com/sqlite/sqlite.git                             && \
     cd sqlite                                                                  && \
     git checkout "version-$(sqlite3 --version | cut -d ' ' -f 1)"              && \
     echo "**** recompile sqlite with icu extension ****"                       && \
