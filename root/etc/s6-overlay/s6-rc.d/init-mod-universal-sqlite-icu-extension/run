@@ -1,14 +1,16 @@
 #!/usr/bin/with-contenv bash
 
-# TODO Need to install icu-dev (alpine) to work
-# TODO Validate ubuntu install
-
 ## Ubuntu
 if [ -f /usr/bin/apt ]; then
     cp -r /defaults/sqlite_icu/ubuntu/* /
+    echo "\
+        libicu74" >> /mod-repo-packages-to-install.list
+
 fi
 
 # Alpine
 if [ -f /sbin/apk ]; then
     cp -r /defaults/sqlite_icu/alpine/* /
+    echo "\
+        icu-dev" >> /mod-repo-packages-to-install.list
 fi

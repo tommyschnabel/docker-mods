@@ -1,7 +1,11 @@
 #!/usr/bin/with-contenv bash
 
 if [[ -n "$SQLITE_MIGRATE_DB" ]]; then
-    # TODO Check to see if DB was created with icu extension
+    if [[ -e ".sqlite_icu_extension_migrated" ]]; then
+        echo "$SQLITE_MIGRATE_DB is already migrated, nothing to do"
+        exit 0
+    fi
+
     echo "**** Migrating $SQLITE_MIGRATE_DB  ****"
     cd $(dirname $SQLITE_MIGRATE_DB)
 
@@ -20,11 +24,25 @@ if [[ -n "$SQLITE_MIGRATE_DB" ]]; then
         echo -e "$BACKUP\t $BACKUP_HASH"
     else
         echo "Verified hashes match, dumping db contents"
-        sqlite3 $DB -- .recover > dump.sql
-        rm $DB
-        sqlite3 $DB -- '.read dump.sql'
+        sqlite3 $DB -- .dump > dump.sql
+        result=$?
+        if [ "$result" != "0" ]; then
+            echo "Dump failed"
+            exit 1
+        fi
 
-        
+        rm $DB
+
+        sqlite3 $DB -- '.read dump.sql'
+        result=$?
+        if [ "$result" != "0" ]; then
+            echo "Dump failed, restoring old db..."
+            mv $BACKUP $DB
+            exit 1
+        fi
+
+        cd -
+        touch '.sqlite_icu_extension_migrated'
         echo "Successfully rebuilt $SQLITE_MIGRATE_DB with icu-extension!"
     fi
 fi
