@@ -1,11 +1,8 @@
 #!/usr/bin/with-contenv bash
 
 if [[ -n "$SQLITE_MIGRATE_DB" ]]; then
-    if [[ -e ".sqlite_icu_extension_migrated" ]]; then
-        echo "$SQLITE_MIGRATE_DB is already migrated, nothing to do"
-        exit 0
-    fi
 
+    # Check if the DB file exists
     if [[ ! -e $SQLITE_MIGRATE_DB ]]; then
         echo "SQLITE_MIGRATE_DB=$SQLITE_MIGRATE_DB: file doesn't exist, exiting..."
         exit 1
@@ -14,13 +11,19 @@ if [[ -n "$SQLITE_MIGRATE_DB" ]]; then
     echo "**** Migrating $SQLITE_MIGRATE_DB  ****"
     cd $(dirname $SQLITE_MIGRATE_DB)
 
+    # Check if we've already migrated this DB
+    if [[ -e ".sqlite_icu_extension_migrated" ]]; then
+        echo "$SQLITE_MIGRATE_DB is already migrated, nothing to do"
+        exit 0
+    fi
+
     DB=$(basename $SQLITE_MIGRATE_DB)
-    UNMIGRATED="unmigrated_$DB"
+    BACKUP="backup_$DB"
     MIGRATED="migrated_$DB"
 
     # Backup DB
-    cp $DB $UNMIGRATED
-    echo "Backup DB saved at $UNMIGRATED"
+    cp $DB $BACKUP
+    echo "Backup DB saved at $BACKUP"
 
     sqlite3 $DB -- .dump > dump.sql
     result=$?
@@ -39,7 +42,6 @@ if [[ -n "$SQLITE_MIGRATE_DB" ]]; then
     echo "Overwriting old db..."
     mv $MIGRATED $DB
 
-    cd -
     touch '.sqlite_icu_extension_migrated'
     echo "Successfully rebuilt $SQLITE_MIGRATE_DB with icu-extension!"
 fi
