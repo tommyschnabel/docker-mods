@@ -7,12 +7,12 @@ Alpine Linux and Ubuntu images are currently supported, and SQLite has been comp
 # Usage
 In any linuxserver.io container, add the following environment variable:
 ```
-DOCKER_MODS=linuxserver/mods:universal-sqlite-icu-extension
+DOCKER_MODS=ghcr.io/tommyschnabel/sqlite-icu-extension:universal-sqlite-icu-extension
 ```
 
 If you're already using another mod, you can install it alongside by separating the mods with `|`:
 ```
-DOCKER_MODS=linuxserver/mods:universal-sqlite-icu-extension|linuxserver/mods:my-other-mod
+DOCKER_MODS=ghcr.io/tommyschnabel/sqlite-icu-extension:universal-sqlite-icu-extension|linuxserver/mods:my-other-mod
 ```
 
 

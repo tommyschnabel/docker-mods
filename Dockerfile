@@ -29,7 +29,7 @@ RUN echo "**** install into /root-layer/defaults/sqlite_icu/alpine ****"       &
 FROM ghcr.io/linuxserver/baseimage-ubuntu:noble AS buildstage_ubuntu
 
 # copy local files
-COPY --from=buildstage_alpine root-layer/ /root-layer/
+COPY root/ /root-layer/
 
 RUN echo "**** install packages ****"                                          && \
     apt update                                                                 && \

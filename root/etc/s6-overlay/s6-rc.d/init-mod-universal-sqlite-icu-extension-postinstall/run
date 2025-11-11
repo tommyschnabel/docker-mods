@@ -1,0 +1,30 @@
+#!/usr/bin/with-contenv bash
+
+if [[ -n "$SQLITE_MIGRATE_DB" ]]; then
+    # TODO Check to see if DB was created with icu extension
+    echo "**** Migrating $SQLITE_MIGRATE_DB  ****"
+    cd $(dirname $SQLITE_MIGRATE_DB)
+
+    DB=$(basename $SQLITE_MIGRATE_DB)
+    BACKUP="old_$DB"
+
+    echo "**** Backing up $DB_NAME to $BACKUP ****"
+    cp $DB $BACKUP
+
+    DB_HASH="$(sha256sum $DB | cut -d' ' -f 1)"
+    BACKUP_HASH="$(sha256sum $BACKUP | cut -d' ' -f 1)"
+
+    if [[ "$DB_HASH" != "$BACKUP_HASH"  ]]; then
+        echo "Cowardly refusing to migrate DB due to mismatched hashes!"
+        echo -e "$DB\t $DB_HASH"
+        echo -e "$BACKUP\t $BACKUP_HASH"
+    else
+        echo "Verified hashes match, dumping db contents"
+        sqlite3 $DB -- .recover > dump.sql
+        rm $DB
+        sqlite3 $DB -- '.read dump.sql'
+
+        
+        echo "Successfully rebuilt $SQLITE_MIGRATE_DB with icu-extension!"
+    fi
+fi
