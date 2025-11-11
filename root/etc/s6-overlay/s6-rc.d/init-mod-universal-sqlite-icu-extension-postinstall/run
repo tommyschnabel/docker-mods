@@ -6,43 +6,40 @@ if [[ -n "$SQLITE_MIGRATE_DB" ]]; then
         exit 0
     fi
 
+    if [[ ! -e $SQLITE_MIGRATE_DB ]]; then
+        echo "SQLITE_MIGRATE_DB=$SQLITE_MIGRATE_DB: file doesn't exist, exiting..."
+        exit 1
+    fi
+
     echo "**** Migrating $SQLITE_MIGRATE_DB  ****"
     cd $(dirname $SQLITE_MIGRATE_DB)
 
     DB=$(basename $SQLITE_MIGRATE_DB)
-    BACKUP="old_$DB"
+    UNMIGRATED="unmigrated_$DB"
+    MIGRATED="migrated_$DB"
 
-    echo "**** Backing up $DB_NAME to $BACKUP ****"
-    cp $DB $BACKUP
+    # Backup DB
+    cp $DB $UNMIGRATED
+    echo "Backup DB saved at $UNMIGRATED"
 
-    DB_HASH="$(sha256sum $DB | cut -d' ' -f 1)"
-    BACKUP_HASH="$(sha256sum $BACKUP | cut -d' ' -f 1)"
-
-    if [[ "$DB_HASH" != "$BACKUP_HASH"  ]]; then
-        echo "Cowardly refusing to migrate DB due to mismatched hashes!"
-        echo -e "$DB\t $DB_HASH"
-        echo -e "$BACKUP\t $BACKUP_HASH"
-    else
-        echo "Verified hashes match, dumping db contents"
-        sqlite3 $DB -- .dump > dump.sql
-        result=$?
-        if [ "$result" != "0" ]; then
-            echo "Dump failed"
-            exit 1
-        fi
-
-        rm $DB
-
-        sqlite3 $DB -- '.read dump.sql'
-        result=$?
-        if [ "$result" != "0" ]; then
-            echo "Dump failed, restoring old db..."
-            mv $BACKUP $DB
-            exit 1
-        fi
-
-        cd -
-        touch '.sqlite_icu_extension_migrated'
-        echo "Successfully rebuilt $SQLITE_MIGRATE_DB with icu-extension!"
+    sqlite3 $DB -- .dump > dump.sql
+    result=$?
+    if [ "$result" != "0" ]; then
+        echo "Dump failed"
+        exit 1
     fi
+
+    sqlite3 $MIGRATED -- '.read dump.sql'
+    result=$?
+    if [ "$result" != "0" ]; then
+        echo "Restoring dump failed"
+        exit 1
+    fi
+
+    echo "Overwriting old db..."
+    mv $MIGRATED $DB
+
+    cd -
+    touch '.sqlite_icu_extension_migrated'
+    echo "Successfully rebuilt $SQLITE_MIGRATE_DB with icu-extension!"
 fi
